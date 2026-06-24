@@ -11,6 +11,7 @@
 #include <SD.h>
 #include <string.h>
 #include "Keyboard.h"
+#include "KeyboardLayout_de_CH.h"
 
 File myFile;
 boolean first = true;
@@ -24,7 +25,7 @@ void setup() {
   
   myFile = SD.open(DEFAULT_FILE_NAME);
   if (myFile) {
-    Keyboard.begin();
+    Keyboard.begin(KeyboardLayout_de_CH);
     
     String line = "";
     while (myFile.available()) {
