@@ -16,9 +16,9 @@ Die CI/CD-Pipeline in `.github/workflows/build.yml` ist der Kernbestandteil unse
 
 ## 2. SRAM & Memory Management (Hardware-Restriktionen)
 Der verwendete CJMCU ATmega32U4 Microcontroller verfügt über extrem limitierte **2,5 KB SRAM**.
-- **Striktes Verbot:** Es herrscht ein **absolutes Verbot für die Nutzung, Instanziierung und dynamische Reallokation der Arduino `String`-Klasse**, insbesondere innerhalb von (Endlos-)Schleifen oder Parsern.
+- **Striktes Verbot:** Es herrscht ein **kategorisches, ausnahmsloses Verbot für jegliche dynamische Speicherallozierungen, ganz besonders die Nutzung, Instanziierung und dynamische Reallokation der Arduino `String`-Klasse**. Dies gilt unter allen Umständen, insbesondere jedoch innerhalb von (Endlos-)Schleifen oder Parsern.
 - **Vorschrift:** Zukünftige Algorithmus-Anpassungen (z.B. beim Parsen von Ducky Scripts oder anderen Serial-Daten) **müssen zwingend** auf statisch allozierte Char-Arrays (`char buffer[MAX_LEN]`) umgestellt werden.
-- **Grund:** Die Verwendung von dynamischen `String`-Objekten führt auf AVR-Architekturen unvermeidlich zu Heap-Fragmentierung und unvorhersehbaren Abstürzen zur Laufzeit (Out-of-Memory).
+- **Grund:** Die Verwendung von dynamischen Speicherallozierungen (und den damit verknüpften Objekten wie `String`) führt auf AVR-Architekturen unvermeidlich zu Heap-Fragmentierung und unvorhersehbaren Abstürzen zur Laufzeit (Out-of-Memory).
 
 ---
 
@@ -38,5 +38,5 @@ Da die Firmware ausschließlich über die CI/CD-Pipeline an die Endbenutzer ausg
 
 ## 5. Fail-Safe & Debugging (Headless Operation)
 Das ATmega32U4 Board wird "headless" (ohne Serial Monitor) betrieben. Klassisches `Serial.println()` ist daher nutzlos für das Debugging durch den Endnutzer.
-- **Standard für alle künftigen Tasks:** Jede Art von Fehlerbehandlung – insbesondere fehlende Peripherie (z.B. wenn die SD-Karte am CS Pin 4 nicht gefunden wird) oder Parse-Fehler – **muss zwingend** über Hardware-Indikatoren signalisiert werden.
+- **Standard für alle künftigen Tasks:** Jede Art von Fehlerbehandlung – insbesondere fehlende Peripherie (z.B. wenn die SD-Karte am CS Pin 4 nicht gefunden wird) oder Parse-Fehler – **muss zwingend** über Hardware-Indikatoren signalisiert werden. Hardware-Fehler im Headless-Betrieb müssen ausnahmslos über visuelle Blink-Codes abgefangen und signalisiert werden.
 - **Umsetzung:** Implementiere bei Fehlerschleifen (`while(1)`) immer visuelle **Blink-Codes** (z. B. auf Pin 13 oder den RX / TX LEDs). Dies ermöglicht eine Fehlerdiagnose ("Debugging without Monitor") für den User.
