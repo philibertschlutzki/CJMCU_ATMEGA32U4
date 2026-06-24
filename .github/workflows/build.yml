@@ -1,4 +1,4 @@
-name: Build Firmware
+name: Build and Deploy Firmware
 
 on:
   push:
@@ -8,8 +8,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,8 +36,23 @@ jobs:
         run: |
           arduino-cli compile --fqbn arduino:avr:leonardo ./Keyboard_automator_ch --output-dir ./build-output
 
+      - name: Prepare firmware for Web-Loader
+        run: |
+          mkdir -p ./deploy
+          cp ./build-output/Keyboard_automator_ch.ino.hex ./deploy/firmware.hex
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyboard-automator-ch-firmware
-          path: ./build-output/*.hex
+          path: ./deploy/firmware.hex
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy web-loader firmware.hex"
