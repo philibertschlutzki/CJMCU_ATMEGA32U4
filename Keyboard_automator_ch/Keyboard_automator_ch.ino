@@ -15,30 +15,41 @@
 
 File myFile;
 boolean first = true;
-String DEFAULT_FILE_NAME = "script.txt";
+const char* DEFAULT_FILE_NAME = "script.txt";
 
 void setup() {
+  pinMode(13, OUTPUT);
 
   if (!SD.begin(4)) {
-    return;
+    while(1) {
+      digitalWrite(13, HIGH);
+      delay(500);
+      digitalWrite(13, LOW);
+      delay(500);
+    }
   }
   
   myFile = SD.open(DEFAULT_FILE_NAME);
   if (myFile) {
     Keyboard.begin(KeyboardLayout_de_CH);
     
-    String line = "";
+    char line[256];
+    int line_index = 0;
     while (myFile.available()) {
       char m = myFile.read();
       if (m == '\n'){
+        line[line_index] = '\0';
         Line(line);
-        line = "";
+        line_index = 0;
+      }
+      else if((int) m != 13)
+      {
+        if (line_index < 255) {
+          line[line_index++] = m;
         }
-        else if((int) m != 13)
-        {
-          line += m;
-        }
+      }
     }
+    line[line_index] = '\0';
     Line(line);
     
     myFile.close();
@@ -48,176 +59,169 @@ void setup() {
   Keyboard.end();
 }
 
-void Line(String l)
+void Line(char* l)
 {
-  int space_1 = l.indexOf(" ");
-  if (space_1 == -1)
+  char* space_ptr = strchr(l, ' ');
+
+  if (space_ptr == NULL)
   {
     Press(l);
   }
-  else if (l.substring(0,space_1) == "STRING")
+  else if (strncmp(l, "STRING ", 7) == 0)
   {
-    Keyboard.print(l.substring(space_1 + 1));
+    Keyboard.print(l + 7);
   }
-  else if (l.substring(0,space_1) == "DELAY")
+  else if (strncmp(l, "DELAY ", 6) == 0)
   {
-    int delaytime = l.substring(space_1 + 1).toInt();
+    int delaytime = atoi(l + 6);
     delay(delaytime);
   }
-  else if(l.substring(0,space_1) == "REM"){}
+  else if(strncmp(l, "REM ", 4) == 0 || strcmp(l, "REM") == 0){}
   else
   {
-      String remain = l;
-
-      while(remain.length() > 0)
-      {
-        int latest_space = remain.indexOf(" ");
-        if (latest_space == -1)
-        {
-          Press(remain);
-          remain = "";
-        }
-        else
-        {
-          Press(remain.substring(0, latest_space));
-          remain = remain.substring(latest_space + 1);
-        }
-        delay(5);
+      char* token = strtok(l, " ");
+      while (token != NULL) {
+          Press(token);
+          token = strtok(NULL, " ");
+          if (token != NULL) {
+              delay(5);
+          }
       }
+      delay(5);
   }
 
   Keyboard.releaseAll();
 }
 
 
-void Press(String b)
+void Press(char* b)
 {
-  if(b.length() == 1)
+  if(strlen(b) == 1)
   {
     char c = b[0];
     Keyboard.press(c);
   }
-  else if (b.equals("ENTER"))
+  else if (strcmp(b, "ENTER") == 0)
   {
     Keyboard.press(KEY_RETURN);
   }
-  else if (b.equals("CTRL"))
+  else if (strcmp(b, "CTRL") == 0)
   {
     Keyboard.press(KEY_LEFT_CTRL);
   }
-    else if (b.equals("SHIFT"))
+  else if (strcmp(b, "SHIFT") == 0)
   {
     Keyboard.press(KEY_LEFT_SHIFT);
   }
-    else if (b.equals("ALT"))
+  else if (strcmp(b, "ALT") == 0)
   {
     Keyboard.press(KEY_LEFT_ALT);
   }
-    else if (b.equals("GUI"))
+  else if (strcmp(b, "GUI") == 0)
   {
     Keyboard.press(KEY_LEFT_GUI);
   }
-    else if (b.equals("UP") || b.equals("UPARROW"))
+  else if (strcmp(b, "UP") == 0 || strcmp(b, "UPARROW") == 0)
   {
     Keyboard.press(KEY_UP_ARROW);
   }
-    else if (b.equals("DOWN") || b.equals("DOWNARROW"))
+  else if (strcmp(b, "DOWN") == 0 || strcmp(b, "DOWNARROW") == 0)
   {
     Keyboard.press(KEY_DOWN_ARROW);
   }
-    else if (b.equals("LEFT") || b.equals("LEFTARROW"))
+  else if (strcmp(b, "LEFT") == 0 || strcmp(b, "LEFTARROW") == 0)
   {
     Keyboard.press(KEY_LEFT_ARROW);
   }
-    else if (b.equals("RIGHT") || b.equals("RIGHTARROW"))
+  else if (strcmp(b, "RIGHT") == 0 || strcmp(b, "RIGHTARROW") == 0)
   {
     Keyboard.press(KEY_RIGHT_ARROW);
   }
-    else if (b.equals("DELETE"))
+  else if (strcmp(b, "DELETE") == 0)
   {
     Keyboard.press(KEY_DELETE);
   }
-    else if (b.equals("PAGEUP"))
+  else if (strcmp(b, "PAGEUP") == 0)
   {
     Keyboard.press(KEY_PAGE_UP);
   }
-    else if (b.equals("PAGEDOWN"))
+  else if (strcmp(b, "PAGEDOWN") == 0)
   {
     Keyboard.press(KEY_PAGE_DOWN);
   }
-    else if (b.equals("HOME"))
+  else if (strcmp(b, "HOME") == 0)
   {
     Keyboard.press(KEY_HOME);
   }
-    else if (b.equals("ESC"))
+  else if (strcmp(b, "ESC") == 0)
   {
     Keyboard.press(KEY_ESC);
   }
-    else if (b.equals("INSERT"))
+  else if (strcmp(b, "INSERT") == 0)
   {
     Keyboard.press(KEY_INSERT);
   }
-    else if (b.equals("TAB"))
+  else if (strcmp(b, "TAB") == 0)
   {
     Keyboard.press(KEY_TAB);
   }
-    else if (b.equals("END"))
+  else if (strcmp(b, "END") == 0)
   {
     Keyboard.press(KEY_END);
   }
-    else if (b.equals("CAPSLOCK"))
+  else if (strcmp(b, "CAPSLOCK") == 0)
   {
     Keyboard.press(KEY_CAPS_LOCK);
   }
-    else if (b.equals("F1"))
+  else if (strcmp(b, "F1") == 0)
   {
     Keyboard.press(KEY_F1);
   }
-    else if (b.equals("F2"))
+  else if (strcmp(b, "F2") == 0)
   {
     Keyboard.press(KEY_F2);
   }
-    else if (b.equals("F3"))
+  else if (strcmp(b, "F3") == 0)
   {
     Keyboard.press(KEY_F3);
   }
-    else if (b.equals("F4"))
+  else if (strcmp(b, "F4") == 0)
   {
     Keyboard.press(KEY_F4);
   }
-    else if (b.equals("F5"))
+  else if (strcmp(b, "F5") == 0)
   {
     Keyboard.press(KEY_F5);
   }
-    else if (b.equals("F6"))
+  else if (strcmp(b, "F6") == 0)
   {
     Keyboard.press(KEY_F6);
   }
-    else if (b.equals("F7"))
+  else if (strcmp(b, "F7") == 0)
   {
     Keyboard.press(KEY_F7);
   }
-    else if (b.equals("F8"))
+  else if (strcmp(b, "F8") == 0)
   {
     Keyboard.press(KEY_F8);
   }
-    else if (b.equals("F9"))
+  else if (strcmp(b, "F9") == 0)
   {
     Keyboard.press(KEY_F9);
   }
-    else if (b.equals("F10"))
+  else if (strcmp(b, "F10") == 0)
   {
     Keyboard.press(KEY_F10);
   }
-    else if (b.equals("F11"))
+  else if (strcmp(b, "F11") == 0)
   {
     Keyboard.press(KEY_F11);
   }
-    else if (b.equals("F12"))
+  else if (strcmp(b, "F12") == 0)
   {
     Keyboard.press(KEY_F12);
   }
-    else if (b.equals("SPACE"))
+  else if (strcmp(b, "SPACE") == 0)
   {
     Keyboard.press(' ');
   } 
