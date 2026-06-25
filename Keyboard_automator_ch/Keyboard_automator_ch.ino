@@ -54,6 +54,12 @@ void setup() {
     
     myFile.close();
   } else {
+    while(1) {
+      digitalWrite(13, HIGH);
+      delay(100);
+      digitalWrite(13, LOW);
+      delay(100);
+    }
   }
 
   Keyboard.end();
@@ -224,7 +230,19 @@ void Press(char* b)
   else if (strcmp(b, "SPACE") == 0)
   {
     Keyboard.press(' ');
-  } 
+  }
+  else
+  {
+    while(1) {
+      for(int i=0; i<3; i++) {
+        digitalWrite(13, HIGH);
+        delay(100);
+        digitalWrite(13, LOW);
+        delay(100);
+      }
+      delay(500);
+    }
+  }
 }
 
 void loop() {
