@@ -34,9 +34,21 @@ jobs:
           arduino-cli lib install "Keyboard"
           arduino-cli lib install "SD"
 
-      - name: Compile
+      - name: Parse VID/PID and Compile
         run: |
-          arduino-cli compile --fqbn arduino:avr:leonardo ./Keyboard_automator_ch --output-dir ./build-output
+          # Lese VID und PID dynamisch aus der Konfigurationsdatei
+          VID=$(jq -r '.VID' ./VID/target_pid_vid.json)
+          PID=$(jq -r '.PID' ./VID/target_pid_vid.json)
+          
+          echo "Kompiliere Firmware mit injizierten IDs -> VID: $VID, PID: $PID"
+          
+          # Überschreibe die USB-Deskriptoren für den Arduino-Core
+          arduino-cli compile --fqbn arduino:avr:leonardo \
+            --build-property "build.vid=$VID" \
+            --build-property "build.pid=$PID" \
+            --build-property "usb.vid=$VID" \
+            --build-property "usb.pid=$PID" \
+            ./Keyboard_automator_ch --output-dir ./build-output
 
       - name: Prepare firmware for Web-Loader
         run: |
