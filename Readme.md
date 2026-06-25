@@ -1,6 +1,6 @@
-# CJMCU ATMEGA32U4 BadUSB Automator (de-CH)
+# CJMCU ATMEGA32U4 Keyboard Automator (de-CH)
 
-Dieses Repository verwandelt ein **CJMCU ATMEGA32U4** Board mit integriertem MicroSD-Kartenleser in einen voll funktionsfähigen BadUSB / Rubber Ducky Klon. Im Gegensatz zu herkömmlichen Rubber Duckies müssen Payloads hier nicht hartkodiert und bei jeder Änderung neu kompiliert werden – sie werden stattdessen einfach von einer SD-Karte gelesen. 
+Dieses Repository verwandelt ein **CJMCU ATMEGA32U4** Board mit integriertem MicroSD-Kartenleser in einen voll funktionsfähigen Rubber Ducky Klon. Im Gegensatz zu herkömmlichen Rubber Duckies müssen Payloads hier nicht hartkodiert und bei jeder Änderung neu kompiliert werden – sie werden stattdessen einfach von einer SD-Karte gelesen. 
 
 Diese Version ist speziell für das **Schweizerdeutsche Tastaturlayout (de-CH)** optimiert und entspricht **strengen Architektur- und Fail-Safe-Richtlinien** für den Headless-Betrieb. Dynamische Speicherallokationen (wie die Arduino `String`-Klasse) sind vollständig eliminiert, um maximale Stabilität bei begrenztem SRAM (2,5 KB) zu garantieren.
 
