@@ -1,0 +1,32 @@
+REM --- Initialisierung ---
+DELAY 1000
+GUI r
+DELAY 500
+STRING notepad
+ENTER
+DELAY 1000
+
+REM --- Test der Layout-Eigenheiten ---
+STRING --- CH-Layout Validierung ---
+ENTER
+ENTER
+
+REM 1. QWERTZ vs QWERTY (ZY-Swap)
+STRING ZY-Test: z y Z Y
+ENTER
+
+REM 2. AltGr Mapping (Oft fehlerhaft bei US-Firmware)
+STRING AltGr-Zeichen: @ { [ ] } \ | ~
+ENTER
+
+REM 3. Shift-Reihe (Zahlenreihe oben)
+STRING Shift-Reihe: ! " # $ % & / ( ) = ?
+ENTER
+
+REM 4. Standard Sonderzeichen
+STRING Sonderzeichen: ; : _ , . - < >
+ENTER
+
+REM --- Abschluss ---
+ENTER
+STRING Validierung abgeschlossen.
