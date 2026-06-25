@@ -47,6 +47,32 @@ Die drei Headless-Fehlerzustände und ihre zwingend vorgeschriebenen Blink-Codes
 - **Syntax-/Parser-Fehler im Ducky Script:** Dreifach-Blinken (3x 100ms HIGH/LOW, dann 500ms Pause)
 
 Bei der Implementierung dieser Blink-Codes sind strikt ressourcenschonendes C/C++ (`digitalWrite`, `delay`) zu verwenden und weiterhin vollständig auf die Arduino `String`-Klasse zu verzichten.
+
+---
+
+## 6. Strikte Parsing- und CI-Regeln
+1. **Robustheit des C-Parsers (Zero-Lock-Policy):** Jeder Parser für SD-Karten-Dateien MUSS explizit gegen *Trailing Newlines* (`\n`), Windows-Artefakte (`\r\n`) und EOF-Artefakte abgesichert sein. Leere Strings dürfen niemals durch den Parser fallen und einen Headless-Error (`while(1)`) auslösen. Guard-Clauses (`strlen() == 0`) sind absolute Pflicht.
+2. **Strict State Management:** Globale Variablen, die deklariert, aber nicht genutzt werden, sind strikt verboten (Zero-Waste-Policy für SRAM).
+3. **CI/CD Pipeline Synchronität:** Die Workflow-Dateien unter `.github/workflows/` müssen zwingend auf den tatsächlichen Default-Branch (hier: `master`) referenzieren. Bei Diskrepanzen schlägt das Deployment fehl.
+
+---
+
+## 7. VID/PID Change & Build Configuration
+Das Spoofing oder die Modifikation der Vendor-ID (VID) und Product-ID (PID) ist streng reglementiert, um die Konsistenz und Wartbarkeit über CI/CD sicherzustellen.
+- **Striktes Verbot:** VID und PID dürfen **niemals** hart in den C++-Quellcode (`.ino` oder assoziierte Header) geschrieben werden.
+- **Vorschrift:** Die Injektion neuer IDs muss ausnahmslos über die externe Konfigurationsdatei `VID/target_pid_vid.json` und die GitHub Actions erfolgen.
+- **Pipeline-Integrität:** Jegliche Modifikation an der CI/CD-Pipeline (`.github/workflows/build.yml`) muss zwingend gewährleisten, dass das JSON-Parsing via `jq` fehlerfrei bleibt und die Werte strikt über die Argumente `--build-property build.vid`, `--build-property build.pid`, `--build-property usb.vid` sowie `--build-property usb.pid` an den `arduino-cli`-Compiler durchgereicht werden.
+## 5. Fail-Safe & Debugging (Headless Operation)
+Das ATmega32U4 Board wird "headless" (ohne Serial Monitor) betrieben. Klassisches `Serial.println()` ist daher nutzlos für das Debugging durch den Endnutzer.
+- **Standard für alle künftigen Tasks:** Jede Art von Fehlerbehandlung – insbesondere fehlende Peripherie (z.B. wenn die SD-Karte am CS Pin 4 nicht gefunden wird) oder Parse-Fehler – **muss zwingend** über Hardware-Indikatoren signalisiert werden. Hardware-Fehler im Headless-Betrieb müssen ausnahmslos über visuelle Blink-Codes abgefangen und signalisiert werden.
+- **Umsetzung:** Implementiere bei Fehlerschleifen (`while(1)`) immer visuelle **Blink-Codes** (z. B. auf Pin 13 oder den RX / TX LEDs). Dies ermöglicht eine Fehlerdiagnose ("Debugging without Monitor") für den User.
+
+Die drei Headless-Fehlerzustände und ihre zwingend vorgeschriebenen Blink-Codes sind:
+- **SD-Karte nicht gefunden:** langsames Blinken (500ms HIGH, 500ms LOW) / bestehendes Verhalten
+- **Payload-Datei (script.txt) nicht gefunden:** schnelles Blinken (100ms HIGH, 100ms LOW)
+- **Syntax-/Parser-Fehler im Ducky Script:** Dreifach-Blinken (3x 100ms HIGH/LOW, dann 500ms Pause)
+
+Bei der Implementierung dieser Blink-Codes sind strikt ressourcenschonendes C/C++ (`digitalWrite`, `delay`) zu verwenden und weiterhin vollständig auf die Arduino `String`-Klasse zu verzichten.
 ## 6. Strikte Parsing- und CI-Regeln
 1. **Robustheit des C-Parsers (Zero-Lock-Policy):** Jeder Parser für SD-Karten-Dateien MUSS explizit gegen *Trailing Newlines* (`\n`), Windows-Artefakte (`\r\n`) und EOF-Artefakte abgesichert sein. Leere Strings dürfen niemals durch den Parser fallen und einen Headless-Error (`while(1)`) auslösen. Guard-Clauses (`strlen() == 0`) sind absolute Pflicht.
 2. **Strict State Management:** Globale Variablen, die deklariert, aber nicht genutzt werden, sind strikt verboten (Zero-Waste-Policy für SRAM).
