@@ -68,7 +68,13 @@ void setup() {
 
 void Line(char* l)
 {
-  if (strlen(l) == 0) return;
+  int len = strlen(l);
+  while(len > 0 && (l[len-1] == '\r' || l[len-1] == '\n')) {
+      l[len-1] = '\0';
+      len--;
+  }
+
+  if (len == 0) return;
 
   char* space_ptr = strchr(l, ' ');
 
@@ -78,7 +84,12 @@ void Line(char* l)
   }
   else if (strncmp(l, "STRING ", 7) == 0)
   {
-    Keyboard.print(l + 7);
+    char* str = l + 7;
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+      Keyboard.write(str[i]);
+      delay(5);
+    }
   }
   else if (strncmp(l, "DELAY ", 6) == 0)
   {
