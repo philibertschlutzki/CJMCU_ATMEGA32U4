@@ -23,12 +23,18 @@ ELAPSED=0
 PORT=""
 
 while [ $ELAPSED -lt $TIMEOUT ]; do
-    # Look for the first ttyACM device
-    PORT=$(ls /dev/ttyACM* 2>/dev/null | head -n 1)
-    if [ -n "$PORT" ] && [ -e "$PORT" ]; then
-        echo "Found device at $PORT"
-        break
-    fi
+    # Iteriere über alle vorhandenen ttyACM Geräte
+    for dev in /dev/ttyACM*; do
+        [ -e "$dev" ] || continue
+        
+        # Prüfe per udevadm, ob das Gerät die exakte PID des Caterina-Bootloaders (0036) hat
+        if udevadm info -q property -n "$dev" 2>/dev/null | grep -q "ID_MODEL_ID=0036"; then
+            PORT="$dev"
+            echo "Found Caterina Bootloader at $PORT"
+            break 2
+        fi
+    done
+    
     sleep 1
     ELAPSED=$((ELAPSED + 1))
     echo -n "."
