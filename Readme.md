@@ -11,6 +11,17 @@ Diese Version ist speziell für das **Schweizerdeutsche Tastaturlayout (de-CH)**
 - **Headless Fail-Safe:** Ausgeklügeltes Error-Handling via LED-Blink-Codes für fehlerfreie Diagnose ohne Serial Monitor.
 - **Automatisierte Builds (CI/CD):** Kompiliert bei jedem Push automatisch in eine fertige `.hex`-Firmware und stellt diese für Web-Flasher bereit.
 
+## 🛡️ Security & VID/PID Spoofing
+Um Security-Restriktionen oder Endpoint-Protection-Systeme (Device Whitelisting) auf Zielrechnern zu umgehen, unterstützt das Projekt die automatisierte Manipulation (Spoofing) der USB Vendor-ID (VID) und Product-ID (PID). 
+
+Die IDs werden nicht direkt im Code verändert, sondern nahtlos und sauber während des CI/CD-Builds injiziert.
+
+1. **Konfiguration anpassen:** Bearbeite die Datei `VID/target_pid_vid.json` und hinterlege dort die gewünschten Hexadezimal-Werte (z.B. von einer regulären Logitech oder Dell Tastatur):
+   ```json
+   {
+       "VID": "0x046D",
+       "PID": "0xC31C"
+   }
 ## 🛠 Voraussetzungen
 1. **Hardware:** Ein ATMEGA32U4 Arduino Ducky von CJMCU mit SD-Karten-Slot.
 2. **Speichermedium:** Eine MicroSD-Karte (FAT32 formatiert).
