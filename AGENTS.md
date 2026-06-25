@@ -47,3 +47,7 @@ Die drei Headless-Fehlerzustände und ihre zwingend vorgeschriebenen Blink-Codes
 - **Syntax-/Parser-Fehler im Ducky Script:** Dreifach-Blinken (3x 100ms HIGH/LOW, dann 500ms Pause)
 
 Bei der Implementierung dieser Blink-Codes sind strikt ressourcenschonendes C/C++ (`digitalWrite`, `delay`) zu verwenden und weiterhin vollständig auf die Arduino `String`-Klasse zu verzichten.
+## 6. Strikte Parsing- und CI-Regeln
+1. **Robustheit des C-Parsers (Zero-Lock-Policy):** Jeder Parser für SD-Karten-Dateien MUSS explizit gegen *Trailing Newlines* (`\n`), Windows-Artefakte (`\r\n`) und EOF-Artefakte abgesichert sein. Leere Strings dürfen niemals durch den Parser fallen und einen Headless-Error (`while(1)`) auslösen. Guard-Clauses (`strlen() == 0`) sind absolute Pflicht.
+2. **Strict State Management:** Globale Variablen, die deklariert, aber nicht genutzt werden, sind strikt verboten (Zero-Waste-Policy für SRAM).
+3. **CI/CD Pipeline Synchronität:** Die Workflow-Dateien unter `.github/workflows/` müssen zwingend auf den tatsächlichen Default-Branch (hier: `master`) referenzieren. Bei Diskrepanzen schlägt das Deployment fehl.

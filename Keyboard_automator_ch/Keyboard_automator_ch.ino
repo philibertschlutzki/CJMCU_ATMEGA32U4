@@ -14,7 +14,6 @@
 #include "KeyboardLayout_de_CH.h"
 
 File myFile;
-boolean first = true;
 const char* DEFAULT_FILE_NAME = "script.txt";
 
 void setup() {
@@ -50,7 +49,9 @@ void setup() {
       }
     }
     line[line_index] = '\0';
-    Line(line);
+    if (line_index > 0) {
+      Line(line);
+    }
     
     myFile.close();
   } else {
@@ -67,6 +68,8 @@ void setup() {
 
 void Line(char* l)
 {
+  if (strlen(l) == 0) return;
+
   char* space_ptr = strchr(l, ' ');
 
   if (space_ptr == NULL)
