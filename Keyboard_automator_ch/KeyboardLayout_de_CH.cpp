@@ -23,11 +23,11 @@ extern const uint8_t KeyboardLayout_de_CH[128] PROGMEM =
 	0x00,          // SO
 	0x00,          // SI
 	0x00,          // DEL
-	0x00,          // DC1
-	0x00,          // DC2
-	0x00,          // DC3
-	0x00,          // DC4
-	0x00,          // NAK
+	0x21|SHIFT,    // DC1  will be mapped to ç
+	0x35|SHIFT,    // DC2  will be mapped to °
+	0x30|ALT_GR,   // DC3  will be mapped to ¢
+	0x30,          // DC4  will be mapped to ¨
+	0x2d|ALT_GR,   // NAK  will be mapped to ´
 	0x00,          // SYN
 	0x00,          // ETB
 	0x00,          // CAN
@@ -40,9 +40,9 @@ extern const uint8_t KeyboardLayout_de_CH[128] PROGMEM =
 	0x00,          // US
 
 	0x2c,          // ' '
-	0x1e|SHIFT,    // !
+	0x30|SHIFT,    // !
 	0x1f|SHIFT,    // "
-	0x31,          // #
+	0x20|ALT_GR,   // #
 	0x21|SHIFT,    // $
 	0x22|SHIFT,    // %
 	0x23|SHIFT,    // &
@@ -50,7 +50,7 @@ extern const uint8_t KeyboardLayout_de_CH[128] PROGMEM =
 	0x25|SHIFT,    // (
 	0x26|SHIFT,    // )
 	0x30|SHIFT,    // *
-	0x30,          // +
+	0x1e|SHIFT,    // +
 	0x36,          // ,
 	0x38,          // -
 	0x37,          // .
@@ -71,7 +71,7 @@ extern const uint8_t KeyboardLayout_de_CH[128] PROGMEM =
 	0x27|SHIFT,    // =
 	0x32|SHIFT,    // >
 	0x2d|SHIFT,    // ?
-	0x14|ALT_GR,   // @
+	0x1f|ALT_GR,   // @
 	0x04|SHIFT,    // A
 	0x05|SHIFT,    // B
 	0x06|SHIFT,    // C

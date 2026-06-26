@@ -30,3 +30,5 @@ ENTER
 REM --- Abschluss ---
 ENTER
 STRING Validierung abgeschlossen.
+
+REM --- Payload sanitization applied ---
