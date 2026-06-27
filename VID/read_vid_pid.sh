@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Farben für die Ausgabe
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+GREEN='\\033[0;32m'
+RED='\\033[0;31m'
+YELLOW='\\033[1;33m'
+NC='\\033[0m' # No Color
 
 echo -e "${YELLOW}=== USB VID/PID Scanner ===${NC}"
 
@@ -19,7 +19,9 @@ if [ ! -f "$JSON_FILE" ]; then
     exit 1
 fi
 
-# VID und PID aus der JSON-Datei auslesen (Fallback auf grep/awk falls jq fehlt)
+# VID und PID aus der JSON-Datei auslesen
+# Unterstützt 'jq', fällt aber sicherheitshalber auf 'grep' & 'awk' zurück, falls 'jq' nicht installiert ist.
+# Zudem werden Präfixe wie "0x" entfernt und alles in Kleinbuchstaben konvertiert, um den Linux-Standard in /sys/ zu matchen.
 if command -v jq &> /dev/null; then
     TARGET_VID=$(jq -r '.VID' "$JSON_FILE" | sed -E 's/^0[xX]//' | tr '[:upper:]' '[:lower:]')
     TARGET_PID=$(jq -r '.PID' "$JSON_FILE" | sed -E 's/^0[xX]//' | tr '[:upper:]' '[:lower:]')
@@ -68,3 +70,10 @@ done
 if [ $FOUND -eq 0 ]; then
     echo -e "${RED}[FEHLSCHLAG] Es ist aktuell kein Gerät mit der gespooften VID $TARGET_VID und PID $TARGET_PID angeschlossen.${NC}"
 fi
+"""
+
+file_path = "read_vid_pid.sh"
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(script_content)
+
+print(f"File saved to {file_path}")

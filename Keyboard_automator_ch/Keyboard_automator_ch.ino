@@ -68,7 +68,13 @@ void setup() {
 
 void Line(char* l)
 {
-  if (strlen(l) == 0) return;
+  int len = strlen(l);
+  while(len > 0 && (l[len-1] == '\r' || l[len-1] == '\n')) {
+      l[len-1] = '\0';
+      len--;
+  }
+
+  if (len == 0) return;
 
   char* space_ptr = strchr(l, ' ');
 
@@ -79,40 +85,10 @@ void Line(char* l)
   else if (strncmp(l, "STRING ", 7) == 0)
   {
     char* str = l + 7;
-    while (*str) {
-      if (*str == (char)0xC3) {
-        str++;
-        if (!*str) break;
-        if (*str == (char)0xA7) { // ç
-          Keyboard.print((char)0x11);
-        }
-      } else if (*str == (char)0xC2) {
-        str++;
-        if (!*str) break;
-        if (*str == (char)0xB0) { // °
-          Keyboard.print((char)0x12);
-        } else if (*str == (char)0xA2) { // ¢
-          Keyboard.print((char)0x13);
-        } else if (*str == (char)0xA8) { // ¨
-          Keyboard.print((char)0x14);
-          Keyboard.releaseAll();
-          delay(5);
-          Keyboard.print(' ');
-        } else if (*str == (char)0xB4) { // ´
-          Keyboard.print((char)0x15);
-          Keyboard.releaseAll();
-          delay(5);
-          Keyboard.print(' ');
-        }
-      } else {
-        Keyboard.print(*str);
-        if (*str == '~' || *str == '^' || *str == '`') {
-          Keyboard.releaseAll();
-          delay(5);
-          Keyboard.print(' ');
-        }
-      }
-      str++;
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+      Keyboard.write(str[i]);
+      delay(5);
     }
   }
   else if (strncmp(l, "DELAY ", 6) == 0)
