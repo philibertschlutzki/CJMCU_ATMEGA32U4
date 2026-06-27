@@ -77,3 +77,12 @@ Bei der Implementierung dieser Blink-Codes sind strikt ressourcenschonendes C/C+
 1. **Robustheit des C-Parsers (Zero-Lock-Policy):** Jeder Parser für SD-Karten-Dateien MUSS explizit gegen *Trailing Newlines* (`\n`), Windows-Artefakte (`\r\n`) und EOF-Artefakte abgesichert sein. Leere Strings dürfen niemals durch den Parser fallen und einen Headless-Error (`while(1)`) auslösen. Guard-Clauses (`strlen() == 0`) sind absolute Pflicht.
 2. **Strict State Management:** Globale Variablen, die deklariert, aber nicht genutzt werden, sind strikt verboten (Zero-Waste-Policy für SRAM).
 3. **CI/CD Pipeline Synchronität:** Die Workflow-Dateien unter `.github/workflows/` müssen zwingend auf den tatsächlichen Default-Branch (hier: `master`) referenzieren. Bei Diskrepanzen schlägt das Deployment fehl.
+
+## 8. HID Layout Rules (Strict de-CH Specification)
+Da dieses Board exklusiv auf Schweizer Zielsysteme ausgerichtet ist, gelten für jegliche Änderungen am Keyboard-Layout absolute Sonderregeln:
+- **Verbot von US/DE-Mappings:** Die `KeyboardLayout_de_CH.cpp` darf unter keinen Umständen mit Standard-ASCII-zu-HID Tabellen von US- oder DE-Layouts überschrieben werden. Modifikationen bedürfen einer exakten Validierung gegen den Schweizer Scancode-Standard.
+- **Dead-Key-Flush-Pflicht:** Auf dem Schweizer Layout sind Tasten wie `~`, `^`, `` ` ``, `¨` und `´` sogenannte Dead-Keys (Tottasten). Jeder Agent und Entwickler **muss** sicherstellen, dass bei der Ausgabe dieser isolierten Zeichen hardwareseitig sofort ein `SPACE` (Leerzeichen) nachgesendet wird. Andernfalls verbleibt der Keystroke im OS-Puffer des Zielrechners, wird nicht gedruckt und zerstört die nachfolgende Payload-Logik.
+
+## 9. Payload-Parsing & Line-Breaks
+- **One-Command-Per-Line:** Ducky-Script Befehle in der `script.txt` dürfen **niemals** über Zeilenumbrüche (`\n` oder `\r\n`) gebrochen werden.
+- **Sanitization ohne Allokation:** Zeilenumbrüche innerhalb von Strings sind illegale Zustände. Der C-Parser in `Keyboard_automator_ch.ino` muss sie als Command-Delimiter werten, darf aber zur Bereinigung von leeren Delimitern (Trailing Newlines) **niemals** dynamische Speicherallokation (`malloc` oder Arduino `String`) nutzen, um die harte SRAM-Grenze (2,5 KB) nicht zu gefährden.
